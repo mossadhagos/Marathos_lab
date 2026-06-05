@@ -15,8 +15,8 @@ def results_raw():
     return (
         spark.readStream.format("cloudFiles")          # Auto Loader
         .option("cloudFiles.format", "csv")
-        .option("cloudFiles.inferColumnTypes", "true") # infers schema for you
+        .option("cloudFiles.inferColumnTypes", "true") # infers schema 
         .option("header", "true")
         .option("encoding", "UTF-8")
-        .load(BASE_DIR)                                # point at the folder
+        .load(BASE_DIR)             # point at the folder
     )
