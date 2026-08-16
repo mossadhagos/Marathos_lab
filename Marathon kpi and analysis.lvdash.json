@@ -1,0 +1,656 @@
+{
+  "datasets": [
+    {
+      "name": "f8b8c73b",
+      "displayName": "sql_dataset",
+      "queryLines": [
+        "SELECT COUNT(*) AS total_results\n",
+        "FROM marathos.gold.fct_results;\n",
+        "\n",
+        "SELECT COUNT (*) AS total_events\n",
+        "FROM marathos.gold.dim_event;\n",
+        "\n",
+        "SELECT COUNT (*) AS total_athletes\n",
+        "FROM marathos.gold.dim_athlete;\n",
+        "\n",
+        "SELECT COUNT(DISTINCT athlete_country) AS countries_represented\n",
+        "FROM marathos.gold.dim_athlete\n",
+        "WHERE athlete_country IS NOT NULL;\n",
+        "\n",
+        "SELECT (FLOOR(athlete_age / 10) * 10) AS age_decade,\n",
+        "        COUNT(*) AS runners\n",
+        "FROM marathos.gold.fct_results\n",
+        "WHERE athlete_age IS NOT NULL\n",
+        "GROUP BY age_decade\n",
+        "ORDER BY age_decade;\n"
+      ],
+      "catalog": "marathos",
+      "schema": "gold"
+    },
+    {
+      "name": "8c692de4",
+      "displayName": "dim_athlete",
+      "config": {
+        "version": "1.1",
+        "source": "marathos.gold.dim_athlete",
+        "dimensions": [
+          {
+            "name": "athlete_id",
+            "expr": "source.athlete_id",
+            "displayName": "Athlete Id"
+          },
+          {
+            "name": "source_athlete_id",
+            "expr": "source.source_athlete_id",
+            "displayName": "Source Athlete Id"
+          },
+          {
+            "name": "athlete_gender",
+            "expr": "source.athlete_gender",
+            "displayName": "Athlete Gender"
+          },
+          {
+            "name": "athlete_year_of_birth",
+            "expr": "source.athlete_year_of_birth",
+            "displayName": "Athlete Year Of Birth"
+          },
+          {
+            "name": "athlete_club",
+            "expr": "source.athlete_club",
+            "displayName": "Athlete Club"
+          },
+          {
+            "name": "athlete_country",
+            "expr": "source.athlete_country",
+            "displayName": "Athlete Country"
+          },
+          {
+            "name": "athlete_age_category",
+            "expr": "source.athlete_age_category",
+            "displayName": "Athlete Age Category"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "a620cb23",
+      "displayName": "dim_event",
+      "config": {
+        "version": "1.1",
+        "source": "marathos.gold.dim_event",
+        "dimensions": [
+          {
+            "name": "event_id",
+            "expr": "source.event_id",
+            "displayName": "Event Id"
+          },
+          {
+            "name": "event_name",
+            "expr": "source.event_name",
+            "displayName": "Event Name"
+          },
+          {
+            "name": "event_distance_value",
+            "expr": "source.event_distance_value",
+            "displayName": "Event Distance Value"
+          },
+          {
+            "name": "event_distance_unit",
+            "expr": "source.event_distance_unit",
+            "displayName": "Event Distance Unit"
+          },
+          {
+            "name": "event_type",
+            "expr": "source.event_type",
+            "displayName": "Event Type"
+          },
+          {
+            "name": "event_number_of_finishers",
+            "expr": "source.event_number_of_finishers",
+            "displayName": "Event Number Of Finishers"
+          }
+        ],
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ]
+      }
+    },
+    {
+      "name": "cc2b9e76",
+      "displayName": "fct_results",
+      "config": {
+        "version": "1.1",
+        "source": "marathos.gold.fct_results",
+        "dimensions": [
+          {
+            "name": "result_id",
+            "expr": "source.result_id",
+            "displayName": "Result Id"
+          },
+          {
+            "name": "event_id",
+            "expr": "source.event_id",
+            "displayName": "Event Id"
+          },
+          {
+            "name": "athlete_id",
+            "expr": "source.athlete_id",
+            "displayName": "Athlete Id"
+          },
+          {
+            "name": "performance_seconds",
+            "expr": "source.performance_seconds",
+            "displayName": "Performance Seconds"
+          },
+          {
+            "name": "performance_km",
+            "expr": "source.performance_km",
+            "displayName": "Performance Km"
+          },
+          {
+            "name": "athlete_age",
+            "expr": "source.athlete_age",
+            "displayName": "Athlete Age"
+          }
+        ]
+      }
+    },
+    {
+      "name": "7919cb0a",
+      "displayName": "kpi",
+      "queryLines": [
+        "SELECT \n",
+        "  (SELECT COUNT(*) FROM marathos.gold.fct_results) AS total_results,\n",
+        "  (SELECT COUNT(*) FROM marathos.gold.dim_event) AS total_events,\n",
+        "  (SELECT COUNT(*) FROM marathos.gold.dim_athlete) AS total_athletes,\n",
+        "  (SELECT COUNT(DISTINCT athlete_country) FROM marathos.gold.dim_athlete WHERE athlete_country IS NOT NULL) AS total_countries;"
+      ]
+    },
+    {
+      "name": "9913c6d3",
+      "displayName": "top_countrys",
+      "queryLines": [
+        "SELECT athlete_country, \n",
+        "        COUNT(*) AS athletes\n",
+        "FROM marathos.gold.dim_athlete\n",
+        "WHERE athlete_country IS NOT NULL\n",
+        "GROUP BY athlete_country\n",
+        "ORDER BY athletes DESC\n",
+        "LIMIT 15;"
+      ]
+    },
+    {
+      "name": "afad9631",
+      "displayName": "Performance",
+      "queryLines": [
+        "SELECT \n",
+        "    FLOOR(performance_seconds / 3600) As finish_time_hours_bucket,\n",
+        "    COUNT(*) AS runner_count\n",
+        "FROM marathos.gold.fct_results\n",
+        "WHERE performance_seconds IS NOT NULL \n",
+        "    AND performance_seconds > 0\n",
+        "GROUP BY 1\n",
+        "ORDER BY 1;"
+      ]
+    }
+  ],
+  "relationshipGraphs": [
+    {
+      "sources": [
+        {
+          "name": "dim_athlete",
+          "datasetName": "8c692de4"
+        },
+        {
+          "name": "dim_event",
+          "datasetName": "a620cb23"
+        },
+        {
+          "name": "fct_results",
+          "datasetName": "cc2b9e76"
+        },
+        {
+          "name": "sql_dataset",
+          "datasetName": "f8b8c73b"
+        },
+        {
+          "name": "kpi",
+          "datasetName": "7919cb0a"
+        },
+        {
+          "name": "Untitled_dataset",
+          "datasetName": "9913c6d3"
+        },
+        {
+          "name": "Untitled_dataset_1",
+          "datasetName": "afad9631"
+        }
+      ],
+      "relationships": [
+        {
+          "name": "relationship_1",
+          "from": "fct_results",
+          "to": "dim_athlete",
+          "on": "`fct_results`.`athlete_id` = `dim_athlete`.`athlete_id`",
+          "cardinality": "CARDINALITY_MANY_TO_ONE"
+        },
+        {
+          "name": "relationship_2",
+          "from": "fct_results",
+          "to": "dim_event",
+          "on": "`fct_results`.`event_id` = `dim_event`.`event_id`",
+          "cardinality": "CARDINALITY_MANY_TO_ONE"
+        }
+      ],
+      "measureExpressions": [
+        {
+          "name": "total_results",
+          "expression": "COUNT(`fct_results`.`result_id`)"
+        },
+        {
+          "name": "total_athletes",
+          "expression": "COUNT(DISTINCT `fct_results`.`athlete_id`)"
+        },
+        {
+          "name": "total_events",
+          "expression": "COUNT(DISTINCT `fct_results`.`event_id`)"
+        },
+        {
+          "name": "avg_performance_seconds",
+          "expression": "AVG(`fct_results`.`performance_seconds`)"
+        },
+        {
+          "name": "avg_performance_km",
+          "expression": "AVG(`fct_results`.`performance_km`)"
+        }
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "95d7f7ef",
+      "displayName": "Untitled page",
+      "layout": [
+        {
+          "widget": {
+            "name": "14faf1ad",
+            "multilineTextboxSpec": {
+              "lines": [
+                ""
+              ]
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 0,
+            "width": 12,
+            "height": 2
+          }
+        },
+        {
+          "widget": {
+            "name": "to",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "measure(total_results)",
+                      "expression": "MEASURE(`total_results`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Total Results",
+                "headerAlignment": "center"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(total_results)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 2,
+            "width": 12,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "to-1",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "measure(total_events)",
+                      "expression": "MEASURE(`total_events`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Total Events",
+                "headerAlignment": "center"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(total_events)",
+                  "style": {
+                    "italic": true,
+                    "underline": true,
+                    "rules": [
+                      {
+                        "condition": {
+                          "operator": ">="
+                        },
+                        "color": "#00A972"
+                      }
+                    ]
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 5,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "600788ce",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "measure(total_athletes)",
+                      "expression": "MEASURE(`total_athletes`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Total Athletes",
+                "headerAlignment": "center"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "measure(total_athletes)",
+                  "style": {
+                    "italic": true,
+                    "underline": true
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 5,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "c4415667",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "countdistinct(dim_athlete__athlete_country)",
+                      "expression": "COUNT(DISTINCT `dim_athlete`.`athlete_country`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`dim_athlete`.`athlete_country` IS NOT NULL"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Total Countries",
+                "headerAlignment": "center"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "countdistinct(dim_athlete__athlete_country)",
+                  "style": {
+                    "italic": true,
+                    "underline": true
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 8,
+            "y": 5,
+            "width": 4,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "y",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "Untitled_dataset__athletes",
+                      "expression": "`Untitled_dataset`.`athletes`"
+                    },
+                    {
+                      "name": "Untitled_dataset__athlete_country",
+                      "expression": "`Untitled_dataset`.`athlete_country`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Top Countries by Athletes",
+                "headerAlignment": "center"
+              },
+              "mark": {
+                "colors": [
+                  "#0DE71E",
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 2
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 3
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 4
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 5
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 6
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 7
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 8
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 9
+                  },
+                  {
+                    "themeColorType": "visualizationColors",
+                    "position": 10
+                  }
+                ]
+              },
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "Untitled_dataset__athletes",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "Untitled_dataset__athlete_country",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "label": {
+                  "show": false
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 8,
+            "width": 6,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "0dd89e39",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "sql_dataset__age_decade",
+                      "expression": "`sql_dataset`.`age_decade`"
+                    },
+                    {
+                      "name": "sql_dataset__runners",
+                      "expression": "`sql_dataset`.`runners`"
+                    }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": {
+                  "fieldName": "sql_dataset__age_decade",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "sql_dataset__runners",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 6,
+            "y": 8,
+            "width": 6,
+            "height": 8
+          }
+        }
+      ],
+      "pageType": "PAGE_TYPE_CANVAS",
+      "layoutVersion": "GRID_V1"
+    }
+  ],
+  "uiSettings": {
+    "theme": {
+      "widgetHeaderAlignment": "ALIGNMENT_UNSPECIFIED"
+    },
+    "applyModeEnabled": false
+  }
+}
