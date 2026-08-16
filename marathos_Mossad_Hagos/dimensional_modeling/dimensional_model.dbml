@@ -1,0 +1,44 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+
+Table fct_results {
+  result_id                 int [primary key]
+  event_id                  int
+  athlete_id                int
+  performance_seconds       int
+  performance_km            float
+  athlete_age               integer
+  date_id                   int 
+}
+
+Table dim_event {
+  event_id                    int [primary key]
+  event_name                  varchar
+  event_distance_value        float
+  event_distance_unit         varchar
+  event_type                  varchar
+  event_number_of_finishers   int 
+}
+
+Table dim_athlete {
+  athlete_id           int [primary key]
+  source_athlete_id    varchar
+  athlete_gender       varchar
+  athlete_year_of_birth int
+  athlete_club         varchar
+  athlete_country      varchar
+  athlete_age_category varchar
+}
+
+Table dim_date {
+  date_id    int [primary key]
+  event_date date
+  year       int
+  month      int
+  day        int
+  weekday    varchar
+}
+Ref: fct_results.event_id   > dim_event.event_id
+Ref: fct_results.athlete_id > dim_athlete.athlete_id
+Ref: fct_results.date_id    > dim_date.date_id
