@@ -4,7 +4,7 @@ BASE_DIR = "/Volumes/marathos/default/marathos_raw"
 
 # Reads the CSV files from a Unity Catalog Volume 
 @dp.table(
-    name="results_raw",
+    name="bronze.results_raw",
     comment="Raw ultra-marathon race results ingested as-is from the source CSV.",
     table_properties={
         "delta.columnMapping.mode": "name",

@@ -502,25 +502,32 @@
                 "query": {
                   "fields": [
                     {
-                      "name": "Untitled_dataset__athletes",
-                      "expression": "`Untitled_dataset`.`athletes`"
+                      "name": "count(Untitled_dataset__*)",
+                      "expression": "COUNT(STRUCT(`Untitled_dataset`.`*`))"
                     },
                     {
                       "name": "Untitled_dataset__athlete_country",
                       "expression": "`Untitled_dataset`.`athlete_country`"
+                    },
+                    {
+                      "name": "sum(Untitled_dataset__athletes)",
+                      "expression": "SUM(`Untitled_dataset`.`athletes`)"
                     }
                   ],
-                  "disaggregated": true
+                  "disaggregated": false
                 }
               }
             ],
             "spec": {
-              "version": 3,
               "frame": {
                 "showTitle": true,
-                "title": "Top Countries by Athletes",
-                "headerAlignment": "center"
+                "headerAlignment": "center",
+                "title": {
+                  "value": "Top Countries by Athletes",
+                  "fields": []
+                }
               },
+              "version": 3,
               "mark": {
                 "colors": [
                   "#0DE71E",
@@ -565,20 +572,25 @@
               "widgetType": "bar",
               "encodings": {
                 "x": {
-                  "fieldName": "Untitled_dataset__athletes",
-                  "scale": {
-                    "type": "quantitative"
-                  }
-                },
-                "y": {
                   "fieldName": "Untitled_dataset__athlete_country",
                   "scale": {
                     "type": "categorical"
                   }
                 },
+                "y": {
+                  "fieldName": "sum(Untitled_dataset__athletes)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
                 "label": {
                   "show": false
-                }
+                },
+                "extra": [
+                  {
+                    "fieldName": "count(Untitled_dataset__*)"
+                  }
+                ]
               },
               "data": {
                 "queryName": "main_query"
@@ -588,25 +600,106 @@
           "position": {
             "x": 0,
             "y": 8,
-            "width": 6,
+            "width": 5,
             "height": 8
           }
         },
         {
           "widget": {
-            "name": "0dd89e39",
+            "name": "age-distribution",
             "queries": [
               {
                 "name": "main_query",
                 "query": {
                   "fields": [
                     {
+                      "name": "sql_dataset__runners",
+                      "expression": "`sql_dataset`.`runners`"
+                    },
+                    {
                       "name": "sql_dataset__age_decade",
                       "expression": "`sql_dataset`.`age_decade`"
                     },
                     {
-                      "name": "sql_dataset__runners",
-                      "expression": "`sql_dataset`.`runners`"
+                      "name": "last(sql_dataset__runners)",
+                      "expression": "LAST(`sql_dataset`.`runners`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "IN_RANGE(`sql_dataset`.`age_decade`, 0D, 100D)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "frame": {
+                "showTitle": true,
+                "title": {
+                  "value": "<span style=\"text-align:center;display:block;\">age distribution </span>",
+                  "fields": []
+                }
+              },
+              "version": 3,
+              "widgetType": "histogram",
+              "encodings": {
+                "x": {
+                  "fieldName": "sql_dataset__age_decade",
+                  "scale": {
+                    "type": "categorical"
+                  }
+                },
+                "y": {
+                  "fieldName": "last(sql_dataset__runners)",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "color": {
+                  "fieldName": "sql_dataset__runners",
+                  "scale": {
+                    "type": "quantitative",
+                    "colorRamp": {
+                      "mode": "scheme",
+                      "scheme": "blues"
+                    }
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 5,
+            "y": 8,
+            "width": 7,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "e01a9b03",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "Untitled_dataset_1__finish_time_hours_bucket",
+                      "expression": "`Untitled_dataset_1`.`finish_time_hours_bucket`"
+                    },
+                    {
+                      "name": "Untitled_dataset_1__runner_count",
+                      "expression": "`Untitled_dataset_1`.`runner_count`"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "IN_RANGE(`Untitled_dataset_1`.`finish_time_hours_bucket`, NULL, 40)"
                     }
                   ],
                   "disaggregated": true
@@ -614,17 +707,76 @@
               }
             ],
             "spec": {
+              "frame": {
+                "showDescription": false,
+                "showTitle": true
+              },
               "version": 3,
-              "widgetType": "bar",
+              "widgetType": "area",
               "encodings": {
                 "x": {
-                  "fieldName": "sql_dataset__age_decade",
+                  "fieldName": "Untitled_dataset_1__finish_time_hours_bucket",
                   "scale": {
                     "type": "quantitative"
                   }
                 },
                 "y": {
-                  "fieldName": "sql_dataset__runners",
+                  "fieldName": "Untitled_dataset_1__runner_count",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 0,
+            "y": 16,
+            "width": 6,
+            "height": 8
+          }
+        },
+        {
+          "widget": {
+            "name": "69d02efd",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "fields": [
+                    {
+                      "name": "dim_athlete__athlete_year_of_birth",
+                      "expression": "`dim_athlete`.`athlete_year_of_birth`"
+                    },
+                    {
+                      "name": "count(dim_athlete__athlete_gender)",
+                      "expression": "COUNT(`dim_athlete`.`athlete_gender`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "IN_RANGE(`dim_athlete`.`athlete_year_of_birth`, 1920D, 2020D)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "histogram",
+              "encodings": {
+                "x": {
+                  "fieldName": "dim_athlete__athlete_year_of_birth",
+                  "scale": {
+                    "type": "quantitative"
+                  }
+                },
+                "y": {
+                  "fieldName": "count(dim_athlete__athlete_gender)",
                   "scale": {
                     "type": "quantitative"
                   }
@@ -637,7 +789,7 @@
           },
           "position": {
             "x": 6,
-            "y": 8,
+            "y": 16,
             "width": 6,
             "height": 8
           }
